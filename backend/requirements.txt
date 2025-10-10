@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+python-multipart
+speechrecognition
+Levenshtein
+pydub
+ffmpeg-python
+imageio-ffmpeg
