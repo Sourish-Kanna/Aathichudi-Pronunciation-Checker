@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.BACKEND_URL; // your backend
+const API_URL = "https://athichudi-api.onrender.com"; // your backend
 
 // Fetch all phrases
 export async function getPhrases() {

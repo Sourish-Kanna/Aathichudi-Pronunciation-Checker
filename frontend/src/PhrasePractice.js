@@ -8,8 +8,8 @@ const PhrasePractice = () => {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false); // Tracks live recording
-  // eslint-disable-next-line
-  const { startRecording, stopRecording, mediaBlobUrl, status } = useReactMediaRecorder({
+// eslint-disable-next-line
+  const { startRecording, stopRecording, mediaBlobUrl, status } = useReactMediaRecorder({ // eslint-disable-next-line
     audio: true,
     onStop: () => setIsRecording(false),
     onStart: () => setIsRecording(true),
