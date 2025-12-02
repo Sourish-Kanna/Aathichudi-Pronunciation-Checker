@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { getPhrases, checkPronunciation } from "./api";
 
