@@ -1,0 +1,95 @@
+/* PhraseList.css */
+
+/* Use the shared gradient background to match other pages */
+.phrase-list-container {
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: var(--bg-gradient);
+    font-family: var(--font-main);
+}
+
+.list-header {
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.list-grid {
+    display: grid;
+    gap: 16px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+.phrase-card-link {
+    text-decoration: none;
+    background-color: var(--white);
+    border-radius: var(--card-radius);
+    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    color: var(--text-main);
+    display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.phrase-card-link:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-group {
+    flex: 1;
+}
+
+.tamil-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--primary-color);
+}
+
+.transliteration-text {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.practice-cta {
+    background-color: #EFF6FF;
+    /* Very light blue pill */
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-left: 16px;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.phrase-card-link:hover .practice-cta {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* Loading/Empty State Styling */
+.loading-container {
+    text-align: center;
+    margin-top: 100px;
+    color: var(--white);
+    font-size: 1.2rem;
+    font-weight: 500;
+}

@@ -1,0 +1,51 @@
+.landing-container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gradient);
+    color: var(--white);
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.landing-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.landing-description {
+    font-size: 1.25rem;
+    max-width: 500px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    opacity: 0.95;
+}
+
+.btn-landing {
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: var(--white);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 50px;
+    /* Pill shape */
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-landing:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.btn-landing:active {
+    transform: translateY(-1px); }
