@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import App from './App';
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import PhraseList from './PhraseList';
@@ -16,12 +17,12 @@ const router = createBrowserRouter(
       <Route path="phrases/:id" element={<PhrasePractice />} />
     </Route>
   ),
-  // {
-  //   future: {
-  //     v7_startTransition: true,
-  //     v7_relativeSplatPath: true,
-  //   },
-  // }
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
 );
 
 root.render(
