@@ -8,12 +8,6 @@ export async function getPhrases() {
   return res.data;
 }
 
-// Fetch a single phrase by id
-export async function getPhraseById(id) {
-  const res = await axios.get(`${API_URL}/phrases/${id}`);
-  return res.data;
-}
-
 // Check pronunciation for a phrase
 export async function checkPronunciation(phraseId, file) {
   const formData = new FormData();

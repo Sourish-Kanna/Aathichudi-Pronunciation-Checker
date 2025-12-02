@@ -50,13 +50,6 @@ class Result(BaseModel):
 def get_phrases():
     return list(PHRASES.values())
 
-
-@app.get("/phrases/{phrase_id}")
-def get_phrase_by_id(phrase_id: int):
-    if phrase_id not in PHRASES:
-        raise HTTPException(status_code=404, detail="Phrase not found")
-    return PHRASES[phrase_id]
-
 @app.post("/check_pronunciation", response_model=Result)
 async def check_pronunciation(
     phrase_id: int = Form(...),
@@ -111,6 +104,6 @@ async def check_pronunciation(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/health")
+@app.get("/")
 def health():
     return {"status": "ok"}
