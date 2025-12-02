@@ -1,4 +1,7 @@
-const LandingPage = ({ onStart }) => {
+import { useNavigate } from 'react-router-dom';
+
+const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <div
       style={{
@@ -22,7 +25,7 @@ const LandingPage = ({ onStart }) => {
       </p>
 
       <button
-        onClick={onStart}
+        onClick={() => navigate('/phrases')}
         style={{
           marginTop: "30px",
           padding: "12px 30px",

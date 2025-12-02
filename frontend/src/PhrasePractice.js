@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useReactMediaRecorder } from "react-media-recorder";
-import { getPhrases, checkPronunciation } from "./api";
+import { getPhrases, getPhraseById, checkPronunciation } from "./api";
 
 const PhrasePractice = () => {
   const [phrases, setPhrases] = useState([]);
@@ -15,11 +16,18 @@ const PhrasePractice = () => {
     onStart: () => setIsRecording(true),
   });
 
+  const { id } = useParams();
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getPhrases();
-        setPhrases(data);
+        if (id) {
+          const single = await getPhraseById(id);
+          setPhrases([single]);
+        } else {
+          const data = await getPhrases();
+          setPhrases(data);
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching phrases:", error);
@@ -27,7 +35,7 @@ const PhrasePractice = () => {
       }
     }
     fetchData();
-  }, []);
+  }, [id]);
 
   const currentPhrase = phrases[currentIndex];
 
@@ -76,7 +84,10 @@ const PhrasePractice = () => {
           transition: "transform 0.3s ease",
         }}
       >
-        <h2 style={{ color: "#2563EB", marginBottom: "10px" }}>📖 Athichudi Practice</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h2 style={{ color: "#2563EB", marginBottom: "10px" }}>📖 Athichudi Practice</h2>
+          <Link to="/phrases" style={{ textDecoration: "none", color: "#2563EB", fontWeight: 700 }}>← Back to List</Link>
+        </div>
         <p style={{ fontSize: "1.4rem", fontWeight: "600", color: "#1F2937" }}>
           {currentPhrase.tamil}
         </p>
