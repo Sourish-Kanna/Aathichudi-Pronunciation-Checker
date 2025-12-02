@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_BACKEND_URL ?? ""; // prefer REACT_APP_ for client-side env
+const API_URL = import.meta.env.VITE_BACKEND_URL ?? "";
 
 // Fetch all phrases
 export async function getPhrases() {

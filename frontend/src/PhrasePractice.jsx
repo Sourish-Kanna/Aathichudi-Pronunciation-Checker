@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { useReactMediaRecorder } from "react-media-recorder";
-import { getPhrases, getPhraseById, checkPronunciation } from "./api";
+import { getPhrases, checkPronunciation } from "./api"; 
 import "./PhrasePractice.css";
 
 const PhrasePractice = () => {
@@ -11,25 +11,40 @@ const PhrasePractice = () => {
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
 
+  const navigate = useNavigate(); // Hook to change URL
+  const { id } = useParams();     // Get ID from URL
+
   // eslint-disable-next-line
-  const { startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({
+  const { startRecording, stopRecording, mediaBlobUrl, clearBlobUrl } = useReactMediaRecorder({
     audio: true,
     onStop: () => setIsRecording(false),
     onStart: () => setIsRecording(true),
   });
 
-  const { id } = useParams();
-
+  // 1. DATA LOADING LOGIC (The Fix)
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
+
+        // ALWAYS fetch the full list. This is crucial for "Next" logic.
+        const allPhrases = await getPhrases();
+        setPhrases(allPhrases);
+
+        // If URL has an ID (e.g., /phrases/5), find that phrase in our list
         if (id) {
-          const single = await getPhraseById(id);
-          setPhrases([single]);
+          const foundIndex = allPhrases.findIndex((p) => String(p.id) === String(id));
+          if (foundIndex !== -1) {
+            setCurrentIndex(foundIndex);
+          } else {
+            // ID invalid/not found? Go to start.
+            setCurrentIndex(0);
+          }
         } else {
-          const data = await getPhrases();
-          setPhrases(data);
+          // No ID? Start at 0.
+          setCurrentIndex(0);
         }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching phrases:", error);
@@ -37,22 +52,41 @@ const PhrasePractice = () => {
       }
     }
     fetchData();
-  }, [id]);
+  }, [id]); // Re-run this if the user manually changes the URL ID
 
   const currentPhrase = phrases[currentIndex];
 
+  // 2. NAVIGATION LOGIC
   const handleUpload = async () => {
     if (!mediaBlobUrl || !currentPhrase) return;
+
+    // Convert blob to file
     const response = await fetch(mediaBlobUrl);
     const blob = await response.blob();
     const file = new File([blob], "user.wav", { type: "audio/wav" });
+
+    // Check pronunciation
     const result = await checkPronunciation(currentPhrase.id, file);
 
     if (result.verdict === "correct") {
       setFeedback("✅ Correct! Moving to next phrase...");
+
       setTimeout(() => {
         setFeedback("");
-        setCurrentIndex((prev) => (prev + 1 < phrases.length ? prev + 1 : 0));
+        clearBlobUrl(); // Clear the recording for the next phrase
+
+        // Calculate the next ID
+        const nextIndex = currentIndex + 1;
+
+        if (nextIndex < phrases.length) {
+          // Move to next phrase by changing the URL
+          const nextPhraseId = phrases[nextIndex].id;
+          navigate(`/phrases/${nextPhraseId}`);
+        } else {
+          // End of list? Loop back to the first one (or show a completion screen)
+          const firstPhraseId = phrases[0].id;
+          navigate(`/phrases/${firstPhraseId}`);
+        }
       }, 1500);
     } else {
       setFeedback("❌ Try Again. Listen closely and repeat.");
@@ -78,7 +112,14 @@ const PhrasePractice = () => {
           <strong>Meaning:</strong> {currentPhrase.meaning_en}
         </div>
 
-        <audio controls src={currentPhrase.audio_tts} className="audio-player" />
+        {/* Audio Player for TTS */}
+        {/* We add a 'key' here so the audio player reloads when the phrase changes */}
+        <audio
+          key={currentPhrase.audio_tts}
+          controls
+          src={currentPhrase.audio_tts}
+          className="audio-player"
+        />
 
         {/* Controls */}
         <div className="controls">
