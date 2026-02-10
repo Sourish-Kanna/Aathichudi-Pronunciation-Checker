@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_BACKEND_URL ?? "";
 export async function getPhrases() {
   try {
     const res = await axios.get(`${API_URL}/phrases`, {
-      timeout: 10000, // 10 second timeout
+      timeout: 30000, // 30 second timeout
     });
     return res.data;
   } catch (err) {
