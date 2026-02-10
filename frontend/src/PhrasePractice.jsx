@@ -11,6 +11,7 @@ const PhrasePractice = () => {
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState(null);
+  const [score, setScore] = useState(null);
 
   const navigate = useNavigate(); // Hook to change URL
   const { id } = useParams();     // Get ID from URL
@@ -70,11 +71,15 @@ const PhrasePractice = () => {
     // Check pronunciation
     const result = await checkPronunciation(currentPhrase.id, file);
 
+    // Store the score
+    setScore(result.score);
+
     if (result.verdict === "correct") {
-      setFeedback("✅ Correct! Moving to next phrase...");
+      setFeedback(`✅ Correct! Score: ${(result.score * 100).toFixed(1)}% - Moving to next phrase...`);
 
       setTimeout(() => {
         setFeedback("");
+        setScore(null);
         clearBlobUrl(); // Clear the recording for the next phrase
 
         // Calculate the next ID
@@ -89,9 +94,9 @@ const PhrasePractice = () => {
           const firstPhraseId = phrases[0].id;
           navigate(`/phrases/${firstPhraseId}`);
         }
-      }, 1500);
+      }, 3000); // Wait 3 seconds before moving to next phrase
     } else {
-      setFeedback("❌ Try Again. Listen closely and repeat.");
+      setFeedback(`❌ Try Again. Score: ${(result.score * 100).toFixed(1)}% - Listen closely and repeat.`);
     }
   };
 
