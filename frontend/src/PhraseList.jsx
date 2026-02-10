@@ -8,26 +8,22 @@ const PhraseList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    async function fetchData() {
-      try {
-        const data = await getPhrases();
-        if (mounted) {
-          setPhrases(data);
-          setError(null);
-        }
-      } catch (e) {
-        console.error("Error fetching phrases:", e);
-        if (mounted) {
-          setError(e.message || "Failed to load phrases. Please check your connection.");
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getPhrases();
+      setPhrases(data);
+    } catch (e) {
+      console.error("Error fetching phrases:", e);
+      setError(e.message || "Failed to load phrases. Please check your connection.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchData();
-    return () => (mounted = false);
   }, []);
 
   return (
@@ -50,7 +46,7 @@ const PhraseList = () => {
           <h3 style={{ marginTop: 0 }}>⚠️ Backend Connection Error</h3>
           <p>{error}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={fetchData} 
             style={{
               marginTop: '10px',
               padding: '10px 20px',

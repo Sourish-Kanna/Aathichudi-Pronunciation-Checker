@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { getPhrases, checkPronunciation } from "./api"; 
@@ -23,39 +23,38 @@ const PhrasePractice = () => {
   });
 
   // 1. DATA LOADING LOGIC (The Fix)
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // ALWAYS fetch the full list. This is crucial for "Next" logic.
+      const allPhrases = await getPhrases();
+      setPhrases(allPhrases);
 
-        // ALWAYS fetch the full list. This is crucial for "Next" logic.
-        const allPhrases = await getPhrases();
-        setPhrases(allPhrases);
-
-        // If URL has an ID (e.g., /phrases/5), find that phrase in our list
-        if (id) {
-          const foundIndex = allPhrases.findIndex((p) => String(p.id) === String(id));
-          if (foundIndex !== -1) {
-            setCurrentIndex(foundIndex);
-          } else {
-            // ID invalid/not found? Go to start.
-            setCurrentIndex(0);
-          }
+      // If URL has an ID (e.g., /phrases/5), find that phrase in our list
+      if (id) {
+        const foundIndex = allPhrases.findIndex((p) => String(p.id) === String(id));
+        if (foundIndex !== -1) {
+          setCurrentIndex(foundIndex);
         } else {
-          // No ID? Start at 0.
+          // ID invalid/not found? Go to start.
           setCurrentIndex(0);
         }
-
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching phrases:", error);
-        setError(error.message || "Failed to load phrases. Please check your connection.");
-        setLoading(false);
+      } else {
+        // No ID? Start at 0.
+        setCurrentIndex(0);
       }
+    } catch (error) {
+      console.error("Error fetching phrases:", error);
+      setError(error.message || "Failed to load phrases. Please check your connection.");
+    } finally {
+      setLoading(false);
     }
+  }, [id]);
+
+  useEffect(() => {
     fetchData();
-  }, [id]); // Re-run this if the user manually changes the URL ID
+  }, [fetchData]); // Re-run this if the user manually changes the URL ID
 
   const currentPhrase = phrases[currentIndex];
 
@@ -117,7 +116,7 @@ const PhrasePractice = () => {
             <h3 style={{ marginTop: 0 }}>⚠️ Backend Connection Error</h3>
             <p>{error}</p>
             <button 
-              onClick={() => window.location.reload()} 
+              onClick={fetchData} 
               style={{
                 marginTop: '10px',
                 padding: '10px 20px',
