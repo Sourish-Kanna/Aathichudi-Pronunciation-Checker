@@ -4,8 +4,22 @@ const API_URL = import.meta.env.VITE_BACKEND_URL ?? "";
 
 // Fetch all phrases
 export async function getPhrases() {
-  const res = await axios.get(`${API_URL}/phrases`);
-  return res.data;
+  try {
+    const res = await axios.get(`${API_URL}/phrases`, {
+      timeout: 10000, // 10 second timeout
+    });
+    return res.data;
+  } catch (err) {
+    console.error("API error:", err);
+    // Re-throw with more descriptive error
+    if (err.code === 'ECONNABORTED') {
+      throw new Error('Backend connection timeout. Please try again.');
+    } else if (err.code === 'ERR_NETWORK' || !err.response) {
+      throw new Error('Cannot connect to backend server. Please check if the backend is running.');
+    } else {
+      throw new Error(`Backend error: ${err.response?.statusText || err.message}`);
+    }
+  }
 }
 
 // Check pronunciation for a phrase

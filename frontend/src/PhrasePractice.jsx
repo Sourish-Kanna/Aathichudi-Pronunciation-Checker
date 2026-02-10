@@ -10,6 +10,7 @@ const PhrasePractice = () => {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate(); // Hook to change URL
   const { id } = useParams();     // Get ID from URL
@@ -26,6 +27,7 @@ const PhrasePractice = () => {
     async function fetchData() {
       try {
         setLoading(true);
+        setError(null);
 
         // ALWAYS fetch the full list. This is crucial for "Next" logic.
         const allPhrases = await getPhrases();
@@ -48,6 +50,7 @@ const PhrasePractice = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching phrases:", error);
+        setError(error.message || "Failed to load phrases. Please check your connection.");
         setLoading(false);
       }
     }
@@ -94,6 +97,45 @@ const PhrasePractice = () => {
   };
 
   if (loading) return <div className="loading">Loading...</div>;
+  if (error) {
+    return (
+      <div className="practice-container">
+        <div className="practice-card">
+          <div className="practice-header">
+            <h2 className="practice-title">Error</h2>
+            <Link to="/phrases" className="back-link">← Back</Link>
+          </div>
+          <div style={{
+            padding: '20px',
+            backgroundColor: '#FEE2E2',
+            border: '2px solid #EF4444',
+            borderRadius: '8px',
+            color: '#991B1B',
+            textAlign: 'center',
+            margin: '20px 0'
+          }}>
+            <h3 style={{ marginTop: 0 }}>⚠️ Backend Connection Error</h3>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{
+                marginTop: '10px',
+                padding: '10px 20px',
+                backgroundColor: '#DC2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!currentPhrase) return <div className="loading">No phrase found.</div>;
 
   return (
