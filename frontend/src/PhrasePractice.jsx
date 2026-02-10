@@ -12,6 +12,7 @@ const PhrasePractice = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState(null);
   const [score, setScore] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
 
   const navigate = useNavigate(); // Hook to change URL
   const { id } = useParams();     // Get ID from URL
@@ -63,40 +64,47 @@ const PhrasePractice = () => {
   const handleUpload = async () => {
     if (!mediaBlobUrl || !currentPhrase) return;
 
-    // Convert blob to file
-    const response = await fetch(mediaBlobUrl);
-    const blob = await response.blob();
-    const file = new File([blob], "user.wav", { type: "audio/wav" });
+    setIsChecking(true);
+    setFeedback("");
 
-    // Check pronunciation
-    const result = await checkPronunciation(currentPhrase.id, file);
+    try {
+      // Convert blob to file
+      const response = await fetch(mediaBlobUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "user.wav", { type: "audio/wav" });
 
-    // Store the score
-    setScore(result.score);
+      // Check pronunciation
+      const result = await checkPronunciation(currentPhrase.id, file);
 
-    if (result.verdict === "correct") {
-      setFeedback(`✅ Correct! Score: ${(result.score * 100).toFixed(1)}% - Moving to next phrase...`);
+      // Store the score
+      setScore(result.score);
 
-      setTimeout(() => {
-        setFeedback("");
-        setScore(null);
-        clearBlobUrl(); // Clear the recording for the next phrase
+      if (result.verdict === "correct") {
+        setFeedback(`✅ Correct! Score: ${(result.score * 100).toFixed(1)}% - Moving to next phrase...`);
 
-        // Calculate the next ID
-        const nextIndex = currentIndex + 1;
+        setTimeout(() => {
+          setFeedback("");
+          setScore(null);
+          clearBlobUrl(); // Clear the recording for the next phrase
 
-        if (nextIndex < phrases.length) {
-          // Move to next phrase by changing the URL
-          const nextPhraseId = phrases[nextIndex].id;
-          navigate(`/phrases/${nextPhraseId}`);
-        } else {
-          // End of list? Loop back to the first one (or show a completion screen)
-          const firstPhraseId = phrases[0].id;
-          navigate(`/phrases/${firstPhraseId}`);
-        }
-      }, 3000); // Wait 3 seconds before moving to next phrase
-    } else {
-      setFeedback(`❌ Try Again. Score: ${(result.score * 100).toFixed(1)}% - Listen closely and repeat.`);
+          // Calculate the next ID
+          const nextIndex = currentIndex + 1;
+
+          if (nextIndex < phrases.length) {
+            // Move to next phrase by changing the URL
+            const nextPhraseId = phrases[nextIndex].id;
+            navigate(`/phrases/${nextPhraseId}`);
+          } else {
+            // End of list? Loop back to the first one (or show a completion screen)
+            const firstPhraseId = phrases[0].id;
+            navigate(`/phrases/${firstPhraseId}`);
+          }
+        }, 3000); // Wait 3 seconds before moving to next phrase
+      } else {
+        setFeedback(`❌ Try Again. Score: ${(result.score * 100).toFixed(1)}% - Listen closely and repeat.`);
+      }
+    } finally {
+      setIsChecking(false);
     }
   };
 
@@ -186,9 +194,34 @@ const PhrasePractice = () => {
         {mediaBlobUrl && !isRecording && (
           <div style={{ marginTop: "20px", borderTop: "1px solid #E5E7EB", paddingTop: "20px" }}>
             <audio src={mediaBlobUrl} controls style={{ width: "100%" }} />
-            <button onClick={handleUpload} className="btn btn-check">
-              ✅ Check Pronunciation
+            <button 
+              onClick={handleUpload} 
+              className="btn btn-check"
+              disabled={isChecking}
+              style={{
+                opacity: isChecking ? 0.6 : 1,
+                cursor: isChecking ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isChecking ? '⏳ Checking...' : '✅ Check Pronunciation'}
             </button>
+          </div>
+        )}
+
+        {/* Loading indicator while checking */}
+        {isChecking && (
+          <div style={{
+            marginTop: '15px',
+            padding: '12px',
+            backgroundColor: '#EFF6FF',
+            border: '2px solid #3B82F6',
+            borderRadius: '8px',
+            color: '#1E40AF',
+            textAlign: 'center',
+            fontSize: '15px',
+            fontWeight: '500'
+          }}>
+            ⏳ Analyzing your pronunciation...
           </div>
         )}
 
