@@ -1,6 +1,7 @@
 # Athichudi Pronunciation Checker
 
 Monorepo with a React frontend and FastAPI backend for checking Tamil phrase pronunciation (transcription + Levenshtein similarity).
+Frontend is based on [sudhar25/athichudi-frontend](https://github.com/sudhar25/athichudi-frontend)
 
 ## Repo layout
 
